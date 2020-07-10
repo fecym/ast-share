@@ -10,7 +10,7 @@ const arrowFnPlugin = {
     ArrowFunctionExpression(path) {
       // 拿到节点然后替换节点
       const node = path.node
-      console.log("ArrowFunctionExpression -> node", node)
+      // console.log("ArrowFunctionExpression -> node", node)
       // 拿到函数的参数
       const params = node.params
       let body = node.body
