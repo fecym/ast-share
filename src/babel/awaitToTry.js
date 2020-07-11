@@ -3,7 +3,7 @@ const t = require('@babel/types');
 
 const code = `
   async function func() {
-    await asyncFunc()
+    await asyncFn()
   }
 `;
 
@@ -16,15 +16,17 @@ const tryPlugin = {
       // 是父节点路径
       // console.log("AwaitExpression -> parentPath", path.parentPath)
 
-      if (path.findParent(path => t.isTryStatement(path.node))) {
-        return
-      }
-
-      const expression = t.expressionStatement(path.node)
-      const tryBlock = t.blockStatement([expression])
-      const tryStatement = t.tryStatement(tryBlock)
+      if (path.findParent(path => t.isTryStatement(path.node))) return;
+      const expression = t.expressionStatement(path.node);
+      const tryBlock = t.blockStatement([expression]);
+      // 生成 catch --> console.log(e)
+      const paramsE = t.identifier('e');
+      const memberExpression = t.MemberExpression(t.identifier('console'), t.identifier('log'));
+      const consoleExpression = t.expressionStatement(t.callExpression(memberExpression, [paramsE]));
+      const catchClause = t.catchClause(paramsE, t.blockStatement([consoleExpression]));
+      const tryStatement = t.tryStatement(tryBlock, catchClause);
       // 数组
-      path.replaceWithMultiple([tryStatement])
+      path.replaceWithMultiple([tryStatement]);
     },
   },
 };
